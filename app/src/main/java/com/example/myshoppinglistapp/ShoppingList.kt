@@ -55,6 +55,9 @@ fun ShoppingListApp() {
     var itemQuantity by remember {
         mutableStateOf("")
     }
+    var lastId by remember {
+        mutableStateOf(0)
+    }
 
 
 
@@ -65,7 +68,9 @@ fun ShoppingListApp() {
     ) {
         Button(
             onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 16.dp)
         ) {
             Text("Add Item")
         }
@@ -75,8 +80,32 @@ fun ShoppingListApp() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(sItems) {
-                ShoppingListItem(it, {}, {})
+            items(sItems) { item ->
+                if (item.isEditing) {
+                    ShoppingItemEditor(item = item, onEditComplete = { editedName, editedQuantity ->
+                        sItems = sItems.map {
+                            it.copy(isEditing = false)
+                        }
+                        val editedItem = sItems.find { it.id == item.id }
+
+                        editedItem?.let {
+                            it.name = editedName
+                            it.quantity = editedQuantity
+                        }
+                    })
+
+
+                } else {
+                    ShoppingListItem(
+                        item = item,
+                        onEditClick = {
+                            sItems = sItems.map { it.copy(isEditing = it.id == item.id) }
+                        },
+                        onDeleteClick = {
+                            sItems = sItems - item
+                        }
+                    )
+                }
             }
         }
     }
@@ -95,7 +124,7 @@ fun ShoppingListApp() {
                     Button(onClick = {
                         if (itemName.isNotBlank()) {
                             val newItem = ShoppingItem(
-                                id = sItems.size + 1,
+                                id = lastId + 1,
                                 name = itemName,
                                 quantity = itemQuantity.toInt()
                             )
@@ -104,6 +133,7 @@ fun ShoppingListApp() {
                             showDialog = false
                             itemName = ""
                             itemQuantity = ""
+                            lastId++
 
                         }
                     }) {
@@ -206,15 +236,24 @@ fun ShoppingListItem(item: ShoppingItem, onEditClick: () -> Unit, onDeleteClick:
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = item.name, modifier = Modifier.padding(16.dp))
-        Text(text = "Qty: ${item.quantity}", modifier = Modifier.padding(16.dp))
+        Column {
+            Text(
+                text = item.name, modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+            Text(
+                text = "Qty: ${item.quantity}",
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
 
         Row(modifier = Modifier.padding(8.dp)) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onEditClick() }) {
                 Icon(imageVector = Icons.Default.Edit, contentDescription = null)
             }
 
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onDeleteClick() }) {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = null)
             }
 
@@ -222,3 +261,5 @@ fun ShoppingListItem(item: ShoppingItem, onEditClick: () -> Unit, onDeleteClick:
     }
 
 }
+
+
