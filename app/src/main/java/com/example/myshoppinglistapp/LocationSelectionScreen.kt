@@ -1,5 +1,6 @@
 package com.example.myshoppinglistapp
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,9 +26,9 @@ fun LocationSelectionScreen(
         mutableStateOf(LatLng(location.latitude, location.longitude))
     }
 
-    var cameraPositionState = rememberCameraPositionState {
+    val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            userLocation.value, 10f
+            userLocation.value, 15f
         )
     }
 
@@ -41,9 +42,10 @@ fun LocationSelectionScreen(
             cameraPositionState = cameraPositionState,
             onMapClick = {
                 userLocation.value = it
-            }
-        ) {
 
+                Log.d("LocationSelectionScreen", "User location: ${it.latitude}, ${it.longitude}")
+            },
+        ) {
             Marker(state = rememberMarkerState(position = userLocation.value))
         }
 
@@ -54,7 +56,7 @@ fun LocationSelectionScreen(
                 LocationData((userLocation.value.latitude), (userLocation.value.longitude))
             onLocationSelected(newLocation)
         }) {
-            Text("Set Location")
+            Text("Set Location ${userLocation.value.latitude}, ${userLocation.value.longitude}")
         }
     }
 }

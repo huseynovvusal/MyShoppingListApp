@@ -138,6 +138,7 @@ fun ShoppingListApp(
                         editedItem?.let {
                             it.name = editedName
                             it.quantity = editedQuantity
+                            it.address = address
                         }
                     })
 
@@ -164,7 +165,9 @@ fun ShoppingListApp(
                 Button(onClick = {
                     if (itemName.isNotBlank()) {
                         val newItem = ShoppingItem(
-                            id = lastId + 1, name = itemName, quantity = itemQuantity.toInt()
+                            id = lastId + 1, name = itemName,
+                            quantity = itemQuantity.toInt(),
+                            address = address
                         )
 
                         sItems = sItems + newItem
@@ -288,38 +291,41 @@ fun ShoppingListItem(item: ShoppingItem, onEditClick: () -> Unit, onDeleteClick:
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Column(modifier = Modifier.weight(1f)) {
-                Row {
-                    Text(
-                        text = item.name,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                    Text(
-                        text = "Qty: ${item.quantity}",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                }
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Icon(imageVector = Icons.Default.LocationOn, contentDescription = null)
-                    Text(text = item.address)
-                }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+        ) {
+            Row {
+                Text(
+                    text = item.name,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                Text(
+                    text = "Qty: ${item.quantity}",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
             }
 
-
-            Row(modifier = Modifier.padding(8.dp)) {
-                IconButton(onClick = { onEditClick() }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = null)
-                }
-
-                IconButton(onClick = { onDeleteClick() }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-                }
-
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Icon(imageVector = Icons.Default.LocationOn, contentDescription = null)
+                Text(text = item.address)
             }
         }
+        Row(modifier = Modifier.padding(8.dp)) {
+            IconButton(onClick = { onEditClick() }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            }
+
+            IconButton(onClick = { onDeleteClick() }) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+            }
+
+        }
+
+
     }
+
 
 }
 
